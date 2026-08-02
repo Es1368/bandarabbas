@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}مقایسه چهار منطقه{% endblock %}
+{% block content %}
+<section class="card">
+  <h2>عملکرد مقایسه‌ای چهار منطقه</h2>
+  <div class="chart-wrap"><canvas id="regionsCatChart"></canvas></div>
+  <table>
+    <thead>
+      <tr>
+        <th>رتبه</th>
+        <th>منطقه</th>
+        {% for cat_key in category_order %}<th>{{ categories[cat_key].title }}</th>{% endfor %}
+        <th>مجموع امتیاز عملکردی</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in summaries %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ s.region_name }}</td>
+        {% for cat_key in category_order %}<td>{{ '%.2f'|format(s.category_avg[cat_key]) }}%</td>{% endfor %}
+        <td>{{ '%.2f'|format(s.overall_avg) }}%</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="card">
+  <h2>عملکرد مقایسه‌ای چهار منطقه – مجموع امتیاز عملکردی</h2>
+  <div class="chart-wrap"><canvas id="regionsOverallChart"></canvas></div>
+  <table>
+    <thead><tr><th>رتبه</th><th>منطقه</th><th>درصد</th></tr></thead>
+    <tbody>
+      {% for s in summaries %}
+      <tr><td>{{ loop.index }}</td><td>{{ s.region_name }}</td><td>{{ '%.2f'|format(s.overall_avg) }}%</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+  makeBarChart("regionsCatChart", {{ labels|tojson }}, {{ datasets|tojson }});
+  makeBarChart("regionsOverallChart", {{ labels|tojson }}, [{
+    label: "مجموع امتیاز عملکردی",
+    backgroundColor: "#8c564b",
+    data: {{ overall|tojson }}
+  }]);
+</script>
+{% endblock %}

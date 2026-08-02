@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}خانه | سامانه ارزیابی آسفالت{% endblock %}
+{% block content %}
+<section class="card">
+  <h2>خوش آمدید</h2>
+  <p>این سامانه برای ثبت امتیازهای عملکردی نواحی و تحلیل عملکرد مناطق چهارگانه شهرداری بندرعباس طراحی شده است.</p>
+</section>
+<section class="card">
+  <h2>۵ ناحیه برتر بر اساس مجموع امتیاز عملکردی</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>رتبه</th>
+        <th>نام ناحیه</th>
+        <th>مجموع امتیاز عملکردی</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in ranked %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ d.full_name }}</td>
+        <td>{{ '%.2f'|format(d.overall) }}%</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

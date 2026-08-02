@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}سامانه ارزیابی آسفالت{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+</head>
+<body>
+  <header>
+    <h1>سامانه ارزیابی عملکرد آسفالت شهرداری بندرعباس</h1>
+    <nav>
+      <a href="{{ url_for('index') }}">خانه</a>
+      <a href="{{ url_for('data_entry') }}">ورود داده</a>
+      {% for idx, name in regions %}
+      <a href="{{ url_for('region_dashboard', region_index=idx) }}">داشبورد {{ name }}</a>
+      {% endfor %}
+      <a href="{{ url_for('regions_comparison') }}">مقایسه چهار منطقه</a>
+      <a href="{{ url_for('tonnage_dashboard') }}">تناژ آسفالت</a>
+      <a href="{{ url_for('overall_comparison') }}">مقایسه کلی</a>
+    </nav>
+  </header>
+
+  <main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <script>
+    Chart.register(ChartDataLabels);
+    const percentFormatter = (value) => `${value.toFixed(2)}%`;
+    const numberFormatter = (value) => `${value.toFixed(2)}`;
+
+    function makeBarChart(canvasId, labels, datasets, options = {}) {
+      const ctx = document.getElementById(canvasId);
+      if (!ctx) return;
+      const suffix = options.suffix || "%";
+      return new Chart(ctx, {
+        type: 'bar',
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'top', rtl: true },
+            datalabels: {
+              color: '#111',
+              anchor: 'end',
+              align: 'top',
+              font: { weight: 'bold' },
+              formatter: (value) => `${Number(value).toFixed(2)}${suffix}`,
+            },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => `${ctx.dataset.label}: ${Number(ctx.parsed.y).toFixed(2)}${suffix}`
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              suggestedMax: suffix === '%' ? 100 : undefined,
+              ticks: {
+                callback: (val) => `${Number(val).toFixed(0)}${suffix}`
+              }
+            }
+          }
+        }
+      });
+    }
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

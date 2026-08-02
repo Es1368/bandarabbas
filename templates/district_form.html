@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}ورود اطلاعات {{ district.full_name }}{% endblock %}
+{% block content %}
+<section class="card">
+  <h2>آیتم های عملکردی {{ district.region_name }} - {{ district.district_name }}</h2>
+  <form method="post">
+    <table>
+      <thead>
+        <tr>
+          <th>دسته</th>
+          <th>آیتم</th>
+          <th>امتیاز کیفی کسب‌شده (۰ تا ۵)</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for cat_key in category_order %}
+        {% set cat = categories[cat_key] %}
+        {% for item in cat['items'] %}
+        <tr>
+          {% if loop.first %}
+          <td rowspan="{{ cat['items']|length }}">{{ cat.title }}</td>
+          {% endif %}
+          <td>{{ item[1] }}</td>
+          <td>
+            <input type="number" min="0" max="5" step="1" name="{{ item[0] }}" value="{{ score_map.get(item[0], 0) }}" required>
+          </td>
+        </tr>
+        {% endfor %}
+      {% endfor %}
+      <tr>
+        <td colspan="2">تناژ آسفالت این ناحیه</td>
+        <td><input type="number" min="0" step="0.01" name="tonnage" value="{{ '%.2f'|format(tonnage_value) }}" required></td>
+      </tr>
+      </tbody>
+    </table>
+    <button type="submit">ذخیره اطلاعات</button>
+  </form>
+</section>
+
+<section class="card grid-3">
+  <div><strong>{{ categories['execution'].title }}:</strong> {{ '%.2f'|format(district_metric.category_scores['execution']) }}%</div>
+  <div><strong>{{ categories['equipment'].title }}:</strong> {{ '%.2f'|format(district_metric.category_scores['equipment']) }}%</div>
+  <div><strong>{{ categories['workforce'].title }}:</strong> {{ '%.2f'|format(district_metric.category_scores['workforce']) }}%</div>
+</section>
+<section class="card">
+  <strong>مجموع امتیاز عملکردی:</strong> {{ '%.2f'|format(district_metric.overall) }}%
+</section>
+{% endblock %}
