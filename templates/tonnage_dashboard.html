@@ -2,8 +2,11 @@
 {% block title %}داشبورد تناژ آسفالت{% endblock %}
 {% block content %}
 {% for chart in region_charts %}
-<section class="card">
-  <h2>تناژ آسفالت {{ chart.region_name }} – به تفکیک ناحیه</h2>
+<section class="card" id="tonnage-region-{{ loop.index }}">
+  <div class="card-header">
+    <h2>تناژ آسفالت {{ chart.region_name }} – به تفکیک ناحیه</h2>
+    <button class="btn-download" onclick="downloadSection('tonnage-region-{{ loop.index }}', 'تناژ-{{ chart.region_name }}')">⬇ دانلود تصویر</button>
+  </div>
   <div class="chart-wrap"><canvas id="tonnageRegion{{ loop.index }}"></canvas></div>
   <table>
     <thead><tr><th>رتبه</th><th>ناحیه</th><th>تناژ</th></tr></thead>
@@ -16,8 +19,11 @@
 </section>
 {% endfor %}
 
-<section class="card">
-  <h2>مقایسه تناژ کل چهار منطقه</h2>
+<section class="card" id="tonnage-total-section">
+  <div class="card-header">
+    <h2>مقایسه تناژ کل چهار منطقه</h2>
+    <button class="btn-download" onclick="downloadSection('tonnage-total-section', 'مقایسه-تناژ-کل-مناطق')">⬇ دانلود تصویر</button>
+  </div>
   <div class="chart-wrap"><canvas id="regionTotalTonnage"></canvas></div>
   <table>
     <thead><tr><th>رتبه</th><th>منطقه</th><th>تناژ کل</th></tr></thead>
@@ -32,19 +38,19 @@
 {% block scripts %}
 <script>
   {% for chart in region_charts %}
-  makeBarChart(
+  makeRankChart(
     "tonnageRegion{{ loop.index }}",
     {{ chart.labels|tojson }},
-    [{ label: "تناژ آسفالت", backgroundColor: "#f28e2b", data: {{ chart['values']|tojson }} }],
-    { suffix: "" }
+    {{ chart['values']|tojson }},
+    { suffix: "", label: "تناژ آسفالت" }
   );
   {% endfor %}
 
-  makeBarChart(
+  makeRankChart(
     "regionTotalTonnage",
     {{ region_totals|map(attribute='region_name')|list|tojson }},
-    [{ label: "تناژ کل منطقه", backgroundColor: "#edc948", data: {{ region_totals|map(attribute='value')|list|tojson }} }],
-    { suffix: "" }
+    {{ region_totals|map(attribute='value')|list|tojson }},
+    { suffix: "", label: "تناژ کل منطقه" }
   );
 </script>
 {% endblock %}

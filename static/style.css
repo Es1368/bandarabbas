@@ -83,3 +83,29 @@ button, .btn {
 }
 .flash.success { background: #d1f5dd; color: #14532d; }
 .flash.error { background: #ffe1e1; color: #7f1d1d; }
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+.card-header h2 {
+  margin: 0;
+}
+.btn-download {
+  background: #2c6fad;
+  color: #fff;
+  border: none;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+.btn-download:hover {
+  background: #1f5a9a;
+}
