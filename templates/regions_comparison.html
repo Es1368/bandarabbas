@@ -1,8 +1,11 @@
 {% extends 'base.html' %}
 {% block title %}مقایسه چهار منطقه{% endblock %}
 {% block content %}
-<section class="card">
-  <h2>عملکرد مقایسه‌ای چهار منطقه</h2>
+<section class="card" id="regions-cat-section">
+  <div class="card-header">
+    <h2>عملکرد مقایسه‌ای چهار منطقه</h2>
+    <button class="btn-download" onclick="downloadSection('regions-cat-section', 'مقایسه-چهار-منطقه')">⬇ دانلود تصویر</button>
+  </div>
   <div class="chart-wrap"><canvas id="regionsCatChart"></canvas></div>
   <table>
     <thead>
@@ -26,8 +29,11 @@
   </table>
 </section>
 
-<section class="card">
-  <h2>عملکرد مقایسه‌ای چهار منطقه – مجموع امتیاز عملکردی</h2>
+<section class="card" id="regions-overall-section">
+  <div class="card-header">
+    <h2>عملکرد مقایسه‌ای چهار منطقه – مجموع امتیاز عملکردی</h2>
+    <button class="btn-download" onclick="downloadSection('regions-overall-section', 'مجموع-امتیاز-چهار-منطقه')">⬇ دانلود تصویر</button>
+  </div>
   <div class="chart-wrap"><canvas id="regionsOverallChart"></canvas></div>
   <table>
     <thead><tr><th>رتبه</th><th>منطقه</th><th>درصد</th></tr></thead>
@@ -42,10 +48,6 @@
 {% block scripts %}
 <script>
   makeBarChart("regionsCatChart", {{ labels|tojson }}, {{ datasets|tojson }});
-  makeBarChart("regionsOverallChart", {{ labels|tojson }}, [{
-    label: "مجموع امتیاز عملکردی",
-    backgroundColor: "#8c564b",
-    data: {{ overall|tojson }}
-  }]);
+  makeRankChart("regionsOverallChart", {{ labels|tojson }}, {{ overall|tojson }}, { label: "مجموع امتیاز عملکردی" });
 </script>
 {% endblock %}

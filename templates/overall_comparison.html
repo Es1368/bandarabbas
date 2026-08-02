@@ -2,8 +2,11 @@
 {% block title %}مقایسه کلی{% endblock %}
 {% block content %}
 {% for chart in charts %}
-<section class="card">
-  <h2>{{ chart.title }}</h2>
+<section class="card" id="chart-section-{{ loop.index }}">
+  <div class="card-header">
+    <h2>{{ chart.title }}</h2>
+    <button class="btn-download" onclick="downloadSection('chart-section-{{ loop.index }}', '{{ chart.title }}')">⬇ دانلود تصویر</button>
+  </div>
   <div class="chart-wrap"><canvas id="overallChart{{ loop.index }}"></canvas></div>
   <table>
     <thead><tr><th>رتبه</th><th>ناحیه</th><th>مقدار</th></tr></thead>
@@ -31,11 +34,11 @@
 {% block scripts %}
 <script>
   {% for chart in charts %}
-  makeBarChart(
+  makeRankChart(
     "overallChart{{ loop.index }}",
     {{ chart.labels|tojson }},
-    [{ label: "{{ chart.title }}", backgroundColor: "{{ chart.color }}", data: {{ chart['values']|tojson }} }],
-    { suffix: "{{ chart.suffix }}" }
+    {{ chart['values']|tojson }},
+    { suffix: "{{ chart.suffix }}", label: "{{ chart.title }}" }
   );
   {% endfor %}
 </script>

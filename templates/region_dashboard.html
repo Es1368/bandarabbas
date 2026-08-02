@@ -1,8 +1,11 @@
 {% extends 'base.html' %}
 {% block title %}داشبورد {{ summary.region_name }}{% endblock %}
 {% block content %}
-<section class="card">
-  <h2>ارزیابی آیتم های عملکردی {{ summary.region_name }} – به تفکیک ناحیه</h2>
+<section class="card" id="region-cat-section-{{ summary.region_index }}">
+  <div class="card-header">
+    <h2>ارزیابی آیتم های عملکردی {{ summary.region_name }} – به تفکیک ناحیه</h2>
+    <button class="btn-download" onclick="downloadSection('region-cat-section-{{ summary.region_index }}', 'ارزیابی-آیتم-{{ summary.region_name }}')">⬇ دانلود تصویر</button>
+  </div>
   <div class="chart-wrap"><canvas id="catChart"></canvas></div>
   <table>
     <thead>
@@ -26,8 +29,11 @@
   </table>
 </section>
 
-<section class="card">
-  <h2>عملکرد {{ summary.region_name }} – به تفکیک ناحیه (مجموع امتیاز عملکردی)</h2>
+<section class="card" id="region-overall-section-{{ summary.region_index }}">
+  <div class="card-header">
+    <h2>عملکرد {{ summary.region_name }} – به تفکیک ناحیه (مجموع امتیاز عملکردی)</h2>
+    <button class="btn-download" onclick="downloadSection('region-overall-section-{{ summary.region_index }}', 'مجموع-امتیاز-{{ summary.region_name }}')">⬇ دانلود تصویر</button>
+  </div>
   <div class="chart-wrap"><canvas id="overallChart"></canvas></div>
   <table>
     <thead><tr><th>رتبه</th><th>ناحیه</th><th>درصد</th></tr></thead>
@@ -42,10 +48,6 @@
 {% block scripts %}
 <script>
   makeBarChart("catChart", {{ labels|tojson }}, {{ datasets|tojson }});
-  makeBarChart("overallChart", {{ labels|tojson }}, [{
-    label: "مجموع امتیاز عملکردی",
-    backgroundColor: "#9467bd",
-    data: {{ overall_data|tojson }}
-  }]);
+  makeRankChart("overallChart", {{ labels|tojson }}, {{ overall_data|tojson }}, { label: "مجموع امتیاز عملکردی" });
 </script>
 {% endblock %}

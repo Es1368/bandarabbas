@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
   <header>
@@ -42,10 +43,34 @@
     const percentFormatter = (value) => `${value.toFixed(2)}%`;
     const numberFormatter = (value) => `${value.toFixed(2)}`;
 
+    // ── Gradient helpers ─────────────────────────────────────────────────────
+    function _hexToRgb(hex) {
+      return [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)];
+    }
+    function _lerpColor(hex1, hex2, t) {
+      const [r1,g1,b1] = _hexToRgb(hex1);
+      const [r2,g2,b2] = _hexToRgb(hex2);
+      return `rgb(${Math.round(r1+(r2-r1)*t)},${Math.round(g1+(g2-g1)*t)},${Math.round(b1+(b2-b1)*t)})`;
+    }
+    // Returns n colors from dark-green (rank 1 = best) to dark-red (rank n = worst)
+    function rankGradientColors(n) {
+      const stops = ['#1b5e20','#388e3c','#81c784','#ffd54f','#fb8c00','#e53935','#b71c1c'];
+      if (n <= 0) return [];
+      if (n === 1) return [stops[0]];
+      return Array.from({length: n}, (_, i) => {
+        const t = i / (n - 1);
+        const pos = t * (stops.length - 1);
+        const lo = Math.floor(pos);
+        const hi = Math.min(lo + 1, stops.length - 1);
+        return _lerpColor(stops[lo], stops[hi], pos - lo);
+      });
+    }
+
+    // ── Core bar chart ────────────────────────────────────────────────────────
     function makeBarChart(canvasId, labels, datasets, options = {}) {
       const ctx = document.getElementById(canvasId);
       if (!ctx) return;
-      const suffix = options.suffix || "%";
+      const suffix = options.suffix !== undefined ? options.suffix : "%";
       return new Chart(ctx, {
         type: 'bar',
         data: { labels, datasets },
@@ -55,9 +80,25 @@
           plugins: {
             legend: { position: 'top', rtl: true },
             datalabels: {
-              color: '#111',
-              anchor: 'end',
-              align: 'top',
+              // Show label centered inside bar; if bar is short (<15% of axis max) show above
+              color: function(context) {
+                const chart = context.chart;
+                const val = context.dataset.data[context.dataIndex];
+                const max = chart.scales && chart.scales.y ? chart.scales.y.max : 100;
+                return (max > 0 && val / max < 0.15) ? '#333' : '#fff';
+              },
+              anchor: function(context) {
+                const chart = context.chart;
+                const val = context.dataset.data[context.dataIndex];
+                const max = chart.scales && chart.scales.y ? chart.scales.y.max : 100;
+                return (max > 0 && val / max < 0.15) ? 'end' : 'center';
+              },
+              align: function(context) {
+                const chart = context.chart;
+                const val = context.dataset.data[context.dataIndex];
+                const max = chart.scales && chart.scales.y ? chart.scales.y.max : 100;
+                return (max > 0 && val / max < 0.15) ? 'top' : 'center';
+              },
               font: { weight: 'bold' },
               formatter: (value) => `${Number(value).toFixed(2)}${suffix}`,
             },
@@ -78,6 +119,35 @@
           }
         }
       });
+    }
+
+    // ── Ranking chart (single dataset, auto gradient) ─────────────────────────
+    function makeRankChart(canvasId, labels, data, options = {}) {
+      const colors = rankGradientColors(data.length);
+      return makeBarChart(
+        canvasId, labels,
+        [{ label: options.label || '', backgroundColor: colors, data }],
+        options
+      );
+    }
+
+    // ── Download section as PNG ───────────────────────────────────────────────
+    function downloadSection(sectionId, filename) {
+      const el = document.getElementById(sectionId);
+      if (!el) return;
+      const btns = el.querySelectorAll('.btn-download');
+      btns.forEach(b => { b.style.visibility = 'hidden'; });
+      html2canvas(el, { backgroundColor: '#ffffff', scale: 2, useCORS: true, logging: false })
+        .then(canvas => {
+          btns.forEach(b => { b.style.visibility = ''; });
+          const a = document.createElement('a');
+          a.download = (filename || 'chart') + '.png';
+          a.href = canvas.toDataURL('image/png');
+          a.click();
+        })
+        .catch(() => {
+          btns.forEach(b => { b.style.visibility = ''; });
+        });
     }
   </script>
   {% block scripts %}{% endblock %}

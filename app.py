@@ -30,7 +30,7 @@ CATEGORIES = {
     },
     "equipment": {
         "title": "تجهیزات",
-        "color": "#d62728",
+        "color": "#9467bd",
         "items": [
             ("equipment_1", "کاتر"),
             ("equipment_2", "غلتک موتوری"),
