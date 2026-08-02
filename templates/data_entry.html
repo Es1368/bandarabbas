@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}ورود داده{% endblock %}
+{% block content %}
+<section class="card">
+  <h2>انتخاب ناحیه برای ورود داده</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>منطقه</th>
+        <th>ناحیه</th>
+        <th>مجموع عملکرد</th>
+        <th>تناژ</th>
+        <th>عملیات</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in districts %}
+      <tr>
+        <td>{{ d.region_name }}</td>
+        <td>{{ d.district_name }}</td>
+        <td>{{ '%.2f'|format(d.overall) }}%</td>
+        <td>{{ '%.2f'|format(d.tonnage) }}</td>
+        <td><a class="btn" href="{{ url_for('district_form', district_id=d.id) }}">ویرایش</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

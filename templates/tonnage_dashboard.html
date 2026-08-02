@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}داشبورد تناژ آسفالت{% endblock %}
+{% block content %}
+{% for chart in region_charts %}
+<section class="card">
+  <h2>تناژ آسفالت {{ chart.region_name }} – به تفکیک ناحیه</h2>
+  <div class="chart-wrap"><canvas id="tonnageRegion{{ loop.index }}"></canvas></div>
+  <table>
+    <thead><tr><th>رتبه</th><th>ناحیه</th><th>تناژ</th></tr></thead>
+    <tbody>
+      {% for d in chart.rows %}
+      <tr><td>{{ loop.index }}</td><td>{{ d.district_name }}</td><td>{{ '%.2f'|format(d.tonnage) }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endfor %}
+
+<section class="card">
+  <h2>مقایسه تناژ کل چهار منطقه</h2>
+  <div class="chart-wrap"><canvas id="regionTotalTonnage"></canvas></div>
+  <table>
+    <thead><tr><th>رتبه</th><th>منطقه</th><th>تناژ کل</th></tr></thead>
+    <tbody>
+      {% for row in region_totals %}
+      <tr><td>{{ loop.index }}</td><td>{{ row.region_name }}</td><td>{{ '%.2f'|format(row.value) }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+  {% for chart in region_charts %}
+  makeBarChart(
+    "tonnageRegion{{ loop.index }}",
+    {{ chart.labels|tojson }},
+    [{ label: "تناژ آسفالت", backgroundColor: "#f28e2b", data: {{ chart['values']|tojson }} }],
+    { suffix: "" }
+  );
+  {% endfor %}
+
+  makeBarChart(
+    "regionTotalTonnage",
+    {{ region_totals|map(attribute='region_name')|list|tojson }},
+    [{ label: "تناژ کل منطقه", backgroundColor: "#edc948", data: {{ region_totals|map(attribute='value')|list|tojson }} }],
+    { suffix: "" }
+  );
+</script>
+{% endblock %}

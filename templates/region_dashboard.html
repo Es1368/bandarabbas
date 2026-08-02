@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}داشبورد {{ summary.region_name }}{% endblock %}
+{% block content %}
+<section class="card">
+  <h2>ارزیابی آیتم های عملکردی {{ summary.region_name }} – به تفکیک ناحیه</h2>
+  <div class="chart-wrap"><canvas id="catChart"></canvas></div>
+  <table>
+    <thead>
+      <tr>
+        <th>رتبه</th>
+        <th>ناحیه</th>
+        {% for cat_key in category_order %}<th>{{ categories[cat_key].title }}</th>{% endfor %}
+        <th>مجموع امتیاز عملکردی</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in summary.districts %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ d.district_name }}</td>
+        {% for cat_key in category_order %}<td>{{ '%.2f'|format(d.category_scores[cat_key]) }}%</td>{% endfor %}
+        <td>{{ '%.2f'|format(d.overall) }}%</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="card">
+  <h2>عملکرد {{ summary.region_name }} – به تفکیک ناحیه (مجموع امتیاز عملکردی)</h2>
+  <div class="chart-wrap"><canvas id="overallChart"></canvas></div>
+  <table>
+    <thead><tr><th>رتبه</th><th>ناحیه</th><th>درصد</th></tr></thead>
+    <tbody>
+      {% for d in summary.districts %}
+      <tr><td>{{ loop.index }}</td><td>{{ d.district_name }}</td><td>{{ '%.2f'|format(d.overall) }}%</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+  makeBarChart("catChart", {{ labels|tojson }}, {{ datasets|tojson }});
+  makeBarChart("overallChart", {{ labels|tojson }}, [{
+    label: "مجموع امتیاز عملکردی",
+    backgroundColor: "#9467bd",
+    data: {{ overall_data|tojson }}
+  }]);
+</script>
+{% endblock %}

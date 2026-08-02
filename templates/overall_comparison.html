@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}مقایسه کلی{% endblock %}
+{% block content %}
+{% for chart in charts %}
+<section class="card">
+  <h2>{{ chart.title }}</h2>
+  <div class="chart-wrap"><canvas id="overallChart{{ loop.index }}"></canvas></div>
+  <table>
+    <thead><tr><th>رتبه</th><th>ناحیه</th><th>مقدار</th></tr></thead>
+    <tbody>
+      {% for d in chart.rows %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ d.full_name }}</td>
+        <td>
+          {% if chart.metric == 'overall' %}
+            {{ '%.2f'|format(d.overall) }}%
+          {% elif chart.metric == 'tonnage' %}
+            {{ '%.2f'|format(d.tonnage) }}
+          {% else %}
+            {{ '%.2f'|format(d.category_scores[chart.metric]) }}%
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endfor %}
+{% endblock %}
+{% block scripts %}
+<script>
+  {% for chart in charts %}
+  makeBarChart(
+    "overallChart{{ loop.index }}",
+    {{ chart.labels|tojson }},
+    [{ label: "{{ chart.title }}", backgroundColor: "{{ chart.color }}", data: {{ chart['values']|tojson }} }],
+    { suffix: "{{ chart.suffix }}" }
+  );
+  {% endfor %}
+</script>
+{% endblock %}
