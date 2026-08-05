@@ -77,29 +77,15 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          layout: { padding: { top: 28 } },
           plugins: {
             legend: { position: 'top', rtl: true },
             datalabels: {
-              // Show label centered inside bar; if bar is short (<15% of axis max) show above
-              color: function(context) {
-                const chart = context.chart;
-                const val = context.dataset.data[context.dataIndex];
-                const max = chart.scales && chart.scales.y ? chart.scales.y.max : 100;
-                return (max > 0 && val / max < 0.15) ? '#333' : '#fff';
-              },
-              anchor: function(context) {
-                const chart = context.chart;
-                const val = context.dataset.data[context.dataIndex];
-                const max = chart.scales && chart.scales.y ? chart.scales.y.max : 100;
-                return (max > 0 && val / max < 0.15) ? 'end' : 'center';
-              },
-              align: function(context) {
-                const chart = context.chart;
-                const val = context.dataset.data[context.dataIndex];
-                const max = chart.scales && chart.scales.y ? chart.scales.y.max : 100;
-                return (max > 0 && val / max < 0.15) ? 'top' : 'center';
-              },
-              font: { weight: 'bold' },
+              color: '#333',
+              anchor: 'end',
+              align: 'top',
+              clip: false,
+              font: { weight: 'bold', size: 11 },
               formatter: (value) => `${Number(value).toFixed(2)}${suffix}`,
             },
             tooltip: {
@@ -112,6 +98,7 @@
             y: {
               beginAtZero: true,
               suggestedMax: suffix === '%' ? 100 : undefined,
+              grace: '10%',
               ticks: {
                 callback: (val) => `${Number(val).toFixed(0)}${suffix}`
               }
